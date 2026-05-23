@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luvio Admin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; }
+  
+  /* Login */
+  #login { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; }
+  #login form { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 2.5rem; width: 380px; max-width: 90vw; }
+  #login h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.3rem; color: #f0f6fc; }
+  #login .sub { font-size: 0.85rem; color: #8b949e; margin-bottom: 1.5rem; }
+  #login input { width: 100%; padding: 10px 14px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 1rem; margin-bottom: 1rem; }
+  #login input:focus { outline: none; border-color: #58a6ff; }
+  #login button { width: 100%; padding: 10px; background: #238636; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 500; }
+  #login button:hover { background: #2ea043; }
+  .error { color: #f85149; font-size: 0.85rem; margin-bottom: 0.5rem; display: none; }
+  
+  /* Dashboard */
+  #dashboard { display: none; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #30363d; flex-wrap: wrap; gap: 0.5rem; }
+  header h1 { font-size: 1.3rem; color: #f0f6fc; }
+  .header-right { display: flex; gap: 1rem; align-items: center; font-size: 0.85rem; color: #8b949e; }
+  .header-right a { color: #58a6ff; text-decoration: none; }
+  .header-right a:hover { text-decoration: underline; }
+  
+  .draft-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; transition: border-color 0.15s; }
+  .draft-card:hover { border-color: #58a6ff; }
+  .draft-card h3 { font-size: 1.15rem; margin-bottom: 0.4rem; color: #f0f6fc; }
+  .draft-card .meta { font-size: 0.8rem; color: #8b949e; margin-bottom: 0.8rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+  .draft-card .meta .tag { background: #1f2937; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+  .draft-card .preview { font-size: 0.9rem; color: #8b949e; line-height: 1.5; margin-bottom: 1rem; max-height: 80px; overflow: hidden; }
+  .draft-card .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; border: none; font-weight: 500; text-decoration: none; display: inline-block; }
+  .btn-publish { background: #238636; color: white; }
+  .btn-publish:hover:not(:disabled) { background: #2ea043; }
+  .btn-publish:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-gh { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+  .btn-gh:hover { background: #30363d; }
+  .btn-logout { background: transparent; color: #f85149; border: 1px solid #30363d; }
+  .btn-logout:hover { background: #21262d; }
+  .btn-token { background: transparent; color: #d2991d; border: 1px solid #30363d; }
+  .btn-token:hover { background: #21262d; }
+  
+  .empty { text-align: center; padding: 3rem; color: #8b949e; }
+  .empty svg { opacity: 0.3; margin-bottom: 1rem; }
+  .loading { text-align: center; padding: 3rem; color: #8b949e; }
+  
+  #tokenModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 99; align-items: center; justify-content: center; }
+  #tokenModal > div { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 2rem; width: 450px; max-width: 90vw; }
+  #tokenModal h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #f0f6fc; }
+  #tokenModal p { font-size: 0.85rem; color: #8b949e; margin-bottom: 1rem; }
+  #tokenModal textarea { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-family: monospace; font-size: 0.85rem; resize: vertical; }
+  #tokenModal .actions { display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end; }
+  #tokenModal.show { display: flex; }
+  
+  .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #238636; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0; transform: translateY(10px); transition: all 0.3s; z-index: 100; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: #da3633; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form onsubmit="login(event)">
+    <h1>🔐 Luvio Admin</h1>
+    <p class="sub">Blog-Verwaltung</p>
+    <p class="error" id="loginError">Falsches Passwort</p>
+    <input type="password" id="password" placeholder="Admin-Passwort" autofocus>
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<div id="dashboard">
+  <header>
+    <h1>📝 Luvio Blog — Entwürfe</h1>
+    <div class="header-right">
+      <span id="draftCount">0</span> Entwürfe
+      <a href="https://LuvioProject.github.io/luvio-blog/" target="_blank">Blog →</a>
+      <button class="btn btn-token" onclick="showTokenModal()">🔑 Token</button>
+      <button class="btn btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+  <div id="draftList"><div class="loading">Lade Entwürfe...</div></div>
+</div>
+
+<div id="tokenModal">
+  <div>
+    <h2>🔑 GitHub Token setzen</h2>
+    <p>Für die "Veröffentlichen"-Funktion wird ein GitHub Token benötigt. Der Token wird nur in deinem Browser (localStorage) gespeichert.</p>
+    <p style="font-size:0.8rem">→ GitHub → Settings → Developer settings → Personal access tokens → Generate new token (classic) → <b>public_repo</b> Scope.</p>
+    <textarea id="tokenInput" rows="3" placeholder="ghp_..."></textarea>
+    <div class="actions">
+      <button class="btn btn-gh" onclick="hideTokenModal()">Abbrechen</button>
+      <button class="btn btn-publish" onclick="saveToken()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO = 'LuvioProject/luvio-blog';
+const PASS_HASH = '07d1185f380e4703cd8fbaf4e4493b9d63fadd596209fb7eb0be6046c6d6c86b';
+
+async function hashPass(pass) {
+  const data = new TextEncoder().encode(pass + 'luvio-salt-2026');
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function getToken() { return localStorage.getItem('luvio_token'); }
+function hasToken() { return !!getToken(); }
+
+function showTokenModal() {
+  document.getElementById('tokenInput').value = getToken() || '';
+  document.getElementById('tokenModal').classList.add('show');
+}
+function hideTokenModal() { document.getElementById('tokenModal').classList.remove('show'); }
+function saveToken() {
+  const t = document.getElementById('tokenInput').value.trim();
+  if (t) { 
+    localStorage.setItem('luvio_token', t);
+    hideTokenModal();
+    showToast('Token gespeichert ✓');
+    loadDrafts();
+  }
+}
+
+function login(e) {
+  e.preventDefault();
+  const pass = document.getElementById('password').value;
+  hashPass(pass).then(h => {
+    if (h === PASS_HASH) {
+      sessionStorage.setItem('luvio_auth', 'true');
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadDrafts();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  });
+}
+
+function logout() {
+  sessionStorage.removeItem('luvio_auth');
+  location.reload();
+}
+
+async function loadDrafts() {
+  const list = document.getElementById('draftList');
+  try {
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    if (hasToken()) headers['Authorization'] = 'token ' + getToken();
+    
+    const resp = await fetch(`https://api.github.com/repos/${REPO}/pulls?state=open&sort=created&direction=desc`, headers);
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    const prs = await resp.json();
+    
+    // Filter only draft PRs (from draft/ branches)
+    const drafts = prs.filter(p => p.head.ref.startsWith('draft/') || p.labels.some(l => l.name === 'draft'));
+    document.getElementById('draftCount').textContent = drafts.length;
+    
+    if (drafts.length === 0) {
+      list.innerHTML = `<div class="empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <p>Keine Entwürfe. Hermes erstellt automatisch neue Posts.</p>
+      </div>`;
+      return;
+    }
+    
+    list.innerHTML = drafts.map(pr => `
+      <div class="draft-card">
+        <h3>${pr.title.replace('[Draft] ', '').replace('[Entwurf] ', '')}</h3>
+        <div class="meta">
+          <span>PR #${pr.number}</span>
+          <span>${new Date(pr.created_at).toLocaleDateString('de-DE')}</span>
+          ${pr.labels.map(l => `<span class="tag">${l.name}</span>`).join('')}
+        </div>
+        <div class="preview">${(pr.body || 'Keine Vorschau verfügbar').substring(0, 200).replace(/\n/g, ' ')}</div>
+        <div class="actions">
+          ${hasToken() 
+            ? `<button class="btn btn-publish" onclick="publishDraft(${pr.number}, '${pr.head.ref}')">✓ Veröffentlichen</button>`
+            : `<button class="btn btn-token" onclick="showTokenModal()">🔑 Token nötig</button>`
+          }
+          <a href="${pr.html_url}" target="_blank" class="btn btn-gh">Auf GitHub ansehen →</a>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty"><p>Fehler beim Laden der Entwürfe.</p></div>';
+    console.error(e);
+  }
+}
+
+async function publishDraft(prNumber, branch) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Wird veröffentlicht...';
+  
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${REPO}/pulls/${prNumber}/merge`, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + getToken(), 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ merge_method: 'merge' })
+    });
+    
+    if (resp.ok) {
+      showToast('Veröffentlicht! 🚀 In ~60 Sekunden live.');
+      fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/${branch}`, {
+        method: 'DELETE', headers: { 'Authorization': 'token ' + getToken() }
+      }).catch(() => {});
+      setTimeout(loadDrafts, 2000);
+    } else {
+      const err = await resp.json();
+      showToast((err.message || 'Fehler beim Veröffentlichen'), true);
+      btn.disabled = false;
+      btn.textContent = '✓ Veröffentlichen';
+    }
+  } catch(e) {
+    showToast('Netzwerkfehler', true);
+    btn.disabled = false;
+    btn.textContent = '✓ Veröffentlichen';
+  }
+}
+
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (isError ? ' error' : '');
+  setTimeout(() => toast.classList.add('show'), 10);
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Auto-login
+if (sessionStorage.getItem('luvio_auth') === 'true') {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadDrafts();
+}
+
+// Enter key in token modal
+document.getElementById('tokenInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveToken();
+});
+</script>
+</body>
+</html>
