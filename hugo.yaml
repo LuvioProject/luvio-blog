@@ -1,10 +1,102 @@
 baseURL: https://LuvioProject.github.io/luvio-blog/
 locale: de-de
-title: Luvio Blog
+languageCode: de-de
+title: Luvio
 theme: PaperMod
+enableEmoji: true
+enableGitInfo: true
+enableRobotsTXT: true
+
+# Don't build drafts
+buildDrafts: false
+buildFuture: false
+buildExpired: false
 
 params:
+  # ── Elegance ──
   showReadingTime: true
   showShareButtons: false
   showPostNavLinks: true
+  showBreadCrumbs: false
+  showCodeCopyButtons: true
+  showRssButtonInSectionTermList: false
+  showAllPagesInArchive: true
+  showPageNums: true
+  showToc: true
+  TocOpen: false
+  
+  # ── Visual ──
   defaultTheme: auto
+  disableThemeToggle: false
+  disableSpecial1stPost: false
+  hidemeta: false
+  hideSummary: false
+  hideFooter: false
+  
+  # ── Comments (Giscus) ──
+  comments: true
+  giscus:
+    repo: LuvioProject/luvio-blog
+    repoId: R_kgDOSlZS5g
+    category: General
+    categoryId: DIC_kwDOSlZS5s4C9p8Z
+    mapping: pathname
+    strict: 0
+    reactions: 1
+    emitMetadata: 0
+    inputPosition: bottom
+    lang: de
+  
+  # ── Profile ──
+  profileMode:
+    enabled: false
+  
+  homeInfoParams:
+    Title: Luvio
+    Content: Entdeckungen aus KI, Technik und Studentenleben.
+  
+  socialIcons:
+    - name: github
+      url: https://github.com/LuvioProject
+    - name: email
+      url: mailto:Luvio.project@gmail.com
+  
+  # ── SEO ──
+  author: Luvio
+  description: "Luvio — KI, Technik & Studentenleben"
+  keywords: [KI, Technik, Student, Deutschland, Tools, Produktivität]
+  
+  # ── Custom CSS ──
+  assets:
+    disableHLJS: false
+    favicon: ""
+    favicon16x16: ""
+    favicon32x32: ""
+    apple_touch_icon: ""
+    safari_pinned_tab: ""
+
+menu:
+  main:
+    - name: Archiv
+      url: /archives
+      weight: 10
+    - name: Tags
+      url: /tags
+      weight: 20
+    - name: Impressum
+      url: /impressum
+      weight: 30
+    - name: Datenschutz
+      url: /datenschutz
+      weight: 40
+
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
