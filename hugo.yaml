@@ -1,0 +1,10 @@
+baseURL: https://LuvioProject.github.io/luvio-blog/
+locale: de-de
+title: Luvio Blog
+theme: PaperMod
+
+params:
+  showReadingTime: true
+  showShareButtons: false
+  showPostNavLinks: true
+  defaultTheme: auto

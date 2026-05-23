@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Luvio Blog</title>
+    <link>https://LuvioProject.github.io/luvio-blog/posts/</link>
+    <description>Recent content in Posts on Luvio Blog</description>
+    <generator>Hugo</generator>
+    <language>de-de</language>
+    <lastBuildDate>Sat, 23 May 2026 01:35:00 +0200</lastBuildDate>
+    <atom:link href="https://LuvioProject.github.io/luvio-blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello World</title>
+      <link>https://LuvioProject.github.io/luvio-blog/posts/hello-world/</link>
+      <pubDate>Sat, 23 May 2026 01:35:00 +0200</pubDate>
+      <guid>https://LuvioProject.github.io/luvio-blog/posts/hello-world/</guid>
+      <description>&lt;p&gt;Willkommen auf meinem Blog!&lt;/p&gt;
+&lt;p&gt;Hier teile ich meine Projekte, Gedanken und Experimente rund um Automatisierung, KI und passive Einnahmequellen.&lt;/p&gt;
+&lt;p&gt;Stay tuned!&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
